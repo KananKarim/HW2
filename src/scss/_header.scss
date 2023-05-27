@@ -1,0 +1,38 @@
+.header {
+  width: 1170px;
+  font-family: $font-family;
+  // background-color: red;
+  margin: 0 auto;
+  &__list {
+    display: flex;
+    padding: 40px 150px;
+    justify-content: space-between;
+    
+    a {
+      @include font(400, 11px, 22px, 1.1);
+      text-transform: uppercase;
+      color: $primary-text-color;
+    }
+
+    a.header__list--active{
+      color: $color-hover;
+    }
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .header {
+    width: 768px;
+
+    &__list {
+      display: flex;
+      padding: 40px 80px;
+  }
+}
+}
+
+@media screen and (max-width: 768px) {
+  .header{
+    display: block;
+  }
+}
