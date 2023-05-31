@@ -17,13 +17,21 @@ const files = {
   imagePath: "src/images/**/*"
 };
 
-const sassTask = () => {
+const sassDevTask = () => {
   return gulp
     .src(files.scssPath)
     .pipe(sourcemaps.init())
     .pipe(sass())
-    .pipe(postcss([autoprefixer(), cssnano()]))
+    .pipe(postcss([autoprefixer()]))
     .pipe(sourcemaps.write("."))
+    .pipe(gulp.dest("dist"));
+};
+
+const sassBuildTask = () => {
+  return gulp
+    .src(files.scssPath)
+    .pipe(sass())
+    .pipe(postcss([autoprefixer(), cssnano()]))
     .pipe(gulp.dest("dist"));
 };
 
@@ -42,10 +50,14 @@ const imageTask = () => {
     .pipe(gulp.dest("dist/images"));
 };
 
+const devTask = gulp.parallel(sassDevTask, jsTask, imageTask);
+const buildTask = gulp.parallel(sassBuildTask, jsTask, imageTask);
+
 const watchTask = () => {
-  gulp.watch([files.scssPath, files.jsPath, files.imagePath], gulp.parallel(sassTask, jsTask, imageTask));
+  gulp.watch([files.scssPath, files.jsPath, files.imagePath], devTask);
 };
 
-export const watch = watchTask; // Export the watch task
+export const dev = gulp.series(devTask, watchTask);
+export const build = buildTask;
 
-export default gulp.series(gulp.parallel(sassTask, jsTask, imageTask), watchTask);
+export default dev;
