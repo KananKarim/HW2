@@ -8,8 +8,10 @@ import sourcemaps from "gulp-sourcemaps";
 import concat from "gulp-concat";
 import uglify from "gulp-uglify";
 import imagemin from "gulp-imagemin";
+import browserSync from "browser-sync";
 
 const sass = gulpSass(dartSass);
+const server = browserSync.create();
 
 const files = {
   scssPath: "src/scss/**/*.scss",
@@ -24,7 +26,8 @@ const sassDevTask = () => {
     .pipe(sass())
     .pipe(postcss([autoprefixer()]))
     .pipe(sourcemaps.write("."))
-    .pipe(gulp.dest("dist"));
+    .pipe(gulp.dest("dist"))
+    .pipe(server.stream());
 };
 
 const sassBuildTask = () => {
@@ -40,14 +43,16 @@ const jsTask = () => {
     .src(files.jsPath)
     .pipe(concat("all.js"))
     .pipe(uglify())
-    .pipe(gulp.dest("dist"));
+    .pipe(gulp.dest("dist"))
+    .pipe(server.stream());
 };
 
 const imageTask = () => {
   return gulp
     .src(files.imagePath)
     .pipe(imagemin())
-    .pipe(gulp.dest("dist/images"));
+    .pipe(gulp.dest("dist/images"))
+    .pipe(server.stream());
 };
 
 const devTask = gulp.parallel(sassDevTask, jsTask, imageTask);
@@ -55,9 +60,18 @@ const buildTask = gulp.parallel(sassBuildTask, jsTask, imageTask);
 
 const watchTask = () => {
   gulp.watch([files.scssPath, files.jsPath, files.imagePath], devTask);
+  gulp.watch("dist/*.html").on("change", server.reload);
 };
 
-export const dev = gulp.series(devTask, watchTask);
+const serveTask = () => {
+  server.init({
+    server: {
+      baseDir: "./"
+    }
+  });
+};
+
+export const dev = gulp.series(devTask, gulp.parallel(watchTask, serveTask));
 export const build = buildTask;
 
 export default dev;

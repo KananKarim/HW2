@@ -356,6 +356,7 @@
   .header__nav--mobile ul a {
     line-height: 20px;
     letter-spacing: 2px;
+    color: #4E4E4E;
   }
   .header__nav--mobile ul a.header__list--active {
     color: #57A4A4;
